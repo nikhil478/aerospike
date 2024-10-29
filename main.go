@@ -33,7 +33,28 @@ func main() {
     writePolicy := aerospike.NewWritePolicy(0, 0)
     writePolicy.TotalTimeout = 5000 * time.Millisecond
 
-    // Create the record key
+	key := CreateNewRecords(namespace, set, writePolicy, client)
+
+	
+
+    // ***
+    // Read back the record we just wrote
+    // ***
+
+    // Create a Policy to set the TotalTimeout for reads
+    // default 1000 ms
+    readPolicy := aerospike.NewPolicy()
+    readPolicy.TotalTimeout = 5000 * time.Millisecond
+
+	GetRecords(key, readPolicy, client)
+
+    
+}
+
+
+func CreateNewRecords(namespace, set string, writePolicy *aerospike.WritePolicy, client *aerospike.Client) (key *aerospike.Key) {
+
+	// Create the record key
     // A tuple consisting of namespace, set name, and user defined key
     key, err := aerospike.NewKey(namespace, set, "bar")
     if err != nil {
@@ -49,16 +70,14 @@ func main() {
         log.Fatal(err)
     }
     log.Println("Succesfully wrote record")
+	return key
+}
 
-    // ***
-    // Read back the record we just wrote
-    // ***
 
-    // Create a Policy to set the TotalTimeout for reads
-    // default 1000 ms
-    readPolicy := aerospike.NewPolicy()
-    readPolicy.TotalTimeout = 5000 * time.Millisecond
+func GetRecords(key *aerospike.Key, readPolicy *aerospike.BasePolicy, client *aerospike.Client) {
 
+	// Create the record key
+    // A tuple consisting of namespace, set name, and user defined key
     // Read the record
     record, err := client.Get(readPolicy, key)
     if err != nil {
