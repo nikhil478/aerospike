@@ -7,15 +7,17 @@ import (
     "github.com/aerospike/aerospike-client-go/v7"
 )
 
+const (
+	address = "127.0.0.1"      // Aerospike Cloud cluster address
+    port = 3000                // Aerospike Cloud cluster port
+    namespace = "test"         // Cluster namespace
+    set = "foo"                // Set name within namespace
+)
+
 func main() {
     // ***
     // Setup
     // ***
-
-    address := "127.0.0.1"      // Aerospike Cloud cluster address
-    port := 3000                // Aerospike Cloud cluster port
-    namespace := "test"         // Cluster namespace
-    set := "foo"                // Set name within namespace
 
     // Create the client and connect to the database
     client, err := aerospike.NewClient(address, port)
