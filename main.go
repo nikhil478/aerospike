@@ -1,10 +1,7 @@
 package main
 
 import (
-	"errors"
 	"log"
-	"reflect"
-	"strings"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go/v7"
@@ -126,73 +123,6 @@ func GetRecords(key *aerospike.Key, client *aerospike.Client) {
 }
 
 // structToBins converts any struct to Aerospike BinMap using reflection
-func StructToBins(data interface{}) (aerospike.BinMap, error) {
-	bins := aerospike.BinMap{}
-	v := reflect.ValueOf(data)
 
-	// If pointer, get the underlying element
-	if v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
 
-	if v.Kind() != reflect.Struct {
-		return nil, errors.New("input must be a struct or pointer to struct")
-	}
 
-	t := v.Type()
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		value := v.Field(i)
-
-		// Get the aerospike tag
-		tag := field.Tag.Get("as")
-		if tag == "" {
-			continue // Skip fields without aerospike tags
-		}
-
-		// Parse tag options
-		tagParts := strings.Split(tag, ",")
-		binName := tagParts[0]
-		omitempty := len(tagParts) > 1 && tagParts[1] == "omitempty"
-
-		// Handle pointer fields
-		if value.Kind() == reflect.Ptr {
-			if value.IsNil() {
-				if !omitempty {
-					return nil, errors.New("nil value for required field: " + field.Name)
-				}
-				continue
-			}
-			value = value.Elem()
-		}
-
-		// Skip zero values if omitempty is set
-		if omitempty && value.IsZero() {
-			continue
-		}
-
-		// Convert the value to an appropriate type for Aerospike
-		switch value.Kind() {
-		case reflect.String, reflect.Int, reflect.Int64, reflect.Float64, reflect.Bool:
-			bins[binName] = value.Interface()
-		case reflect.Struct:
-			if value.Type() == reflect.TypeOf(time.Time{}) {
-				bins[binName] = value.Interface()
-			} else {
-				// Handle nested structs if needed
-				nestedBins, err := StructToBins(value.Interface())
-				if err != nil {
-					return nil, err
-				}
-				for k, v := range nestedBins {
-					bins[binName+"_"+k] = v
-				}
-			}
-		default:
-			// Handle other types or return error for unsupported types
-			return nil, errors.New("unsupported field type: " + field.Name)
-		}
-	}
-
-	return bins, nil
-}
