@@ -7,6 +7,7 @@ toolchain go1.23.1
 require github.com/aerospike/aerospike-client-go/v7 v7.6.0
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/onsi/ginkgo/v2 v2.20.1 // indirect
 	github.com/onsi/gomega v1.34.2 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
