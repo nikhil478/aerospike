@@ -45,3 +45,6 @@ Struct Tagging: Uses Go struct tags (as:"bin_name") to map struct fields to Aero
 Support for Nested Structs: Automatically handles nested structs and flattens them into the parent bin.
 Nil and Zero Value Handling: Supports the omitempty tag to skip zero or nil values.
 Error Handling: Returns an error if unsupported types or nil values for required fields are encountered.
+
+Note :
+1. Make sure to pass a pointer to the struct when using the GetRecord method.
