@@ -1,0 +1,1 @@
+Idea is to use combination sort of thing over aerospike which implements datomic basic properties which will be helpful to get state of database at any time A along with that there will be some sort of query from which we will be able to get who is child of whom as neo4j excells in that 
