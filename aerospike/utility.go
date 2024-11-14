@@ -13,8 +13,6 @@ import (
 func BinsToStruct(record *aerospike.Record, result interface{}) error {
 
 
-	// fmt.Print("before record %v", record)
-
 	if record == nil {
 		return errors.New("nil record")
 	}
@@ -34,8 +32,6 @@ func BinsToStruct(record *aerospike.Record, result interface{}) error {
 
 	v = v.Elem()
 	t := v.Type()
-
-	// fmt.Print("after elem & type of  %v", record)
 	
 
 	for i := 0; i < t.NumField(); i++ {
