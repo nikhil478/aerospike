@@ -30,7 +30,7 @@ func main() {
 	}
 	defer asDb.Close()
 
-	utxo.CreateUtxos(asDb)
+	utxo.UpdateUtxos(asDb)
 
 	// retrieveObj := aerospike_db.AerospikeConfig{}
 

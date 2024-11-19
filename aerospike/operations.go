@@ -70,9 +70,9 @@ func (adb *AerospikeDB) DeleteRecord(key *aerospike.Key) error {
 	return nil
 }
 
-func (adb *AerospikeDB) GetRecords(setName string, conditions map[string]string, result interface{}) ([]interface{}, error) {
+func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]string, result interface{}) ([]interface{}, error) {
 
-	statement := aerospike.NewStatement(adb.config.Namespace, setName)
+	statement := aerospike.NewStatement(adb.config.Namespace, string(setName))
 
 	// note we can only pass one condition now there is an workaroud for multiple condition with policies which we havent yet implemented
 	for binName, binValue := range conditions {
