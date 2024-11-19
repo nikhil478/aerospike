@@ -3,7 +3,6 @@ package aerospike_db
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go/v7"
@@ -71,9 +70,9 @@ func (adb *AerospikeDB) DeleteRecord(key *aerospike.Key) error {
 	return nil
 }
 
-func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]any, result interface{}) ([]interface{}, error) {
+func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]any, result interface{}) (<-chan *aerospike.Result, error) {
 
-	statement := aerospike.NewStatement(adb.config.Namespace, string(setName))
+	statement := aerospike.NewStatement(adb.config.Namespace, "newUtxo")
 
 	var expressions []*aerospike.Expression
 	queryPolicy := aerospike.NewQueryPolicy()
@@ -108,19 +107,5 @@ func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[stri
 		return nil, err
 	}
 	defer recordset.Close()
-
-	var resultList []interface{}
-
-	for record := range recordset.Results() {
-
-		if record.Err != nil {
-			continue
-		}
-		newResult := reflect.New(reflect.TypeOf(result).Elem()).Interface()
-		if err := BinsToStruct(record.Record, newResult); err != nil {
-			continue
-		}
-		resultList = append(resultList, newResult)
-	}
-	return resultList, nil
+	return recordset.Results(), nil
 }

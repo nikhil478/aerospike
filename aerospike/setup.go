@@ -14,6 +14,7 @@ const (
 	Notif    AerospikeSetName = "notif"
 	Activity AerospikeSetName = "activity"
 	Utxo     AerospikeSetName = "utxo"
+	NewUtxo     AerospikeSetName = "newUtxo"
 )
 
 // AerospikeConfig holds the Aerospike cluster configuration

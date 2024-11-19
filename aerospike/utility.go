@@ -97,8 +97,6 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 	bins := aerospike.BinMap{}
 	v := reflect.ValueOf(data)
 
-	// If pointer, get the underlying element
-
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -112,13 +110,11 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 		field := t.Field(i)
 		value := v.Field(i)
 
-		// Get the aerospike tag
 		tag := field.Tag.Get("as")
 		if tag == "" {
-			continue // Skip fields without aerospike tags
+			continue
 		}
 
-		// Parse tag options
 		tagParts := strings.Split(tag, ",")
 		binName := tagParts[0]
 		omitempty := len(tagParts) > 1 && tagParts[1] == "omitempty"
