@@ -16,7 +16,7 @@ func (adb *AerospikeDB) CreateNewRecord(setName AerospikeSetName, data interface
 	
 	binMap, err := StructToBins(data)
 	if err != nil {
-		return nil, errors.New("failed to convert struct to bins")
+		return nil, errors.New("failed to convert struct to bins" + err.Error())
 	}
 
 	id := uuid.New().String()
@@ -51,7 +51,7 @@ func (adb *AerospikeDB) UpdateRecord(data interface{}, key *aerospike.Key) error
 
 	binMap, err := StructToBins(data)
 	if err != nil {
-		return errors.New("failed to convert struct to bins")
+		return errors.New("failed to convert struct to bins" + err.Error())
 	}
 
 	err = adb.client.Put(adb.updatePolicy, key, binMap)

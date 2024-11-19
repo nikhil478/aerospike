@@ -98,6 +98,7 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 	v := reflect.ValueOf(data)
 
 	// If pointer, get the underlying element
+
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
@@ -122,7 +123,6 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 		binName := tagParts[0]
 		omitempty := len(tagParts) > 1 && tagParts[1] == "omitempty"
 
-		// Handle pointer fields
 		if value.Kind() == reflect.Ptr {
 			if value.IsNil() {
 				if !omitempty {
@@ -133,12 +133,10 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 			value = value.Elem()
 		}
 
-		// Skip zero values if omitempty is set
 		if omitempty && value.IsZero() {
 			continue
 		}
 
-		// Convert the value to an appropriate type for Aerospike
 		switch value.Kind() {
 		case reflect.String, reflect.Int, reflect.Int64, reflect.Float64, reflect.Bool:
 			bins[binName] = value.Interface()
@@ -146,7 +144,6 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 			if value.Type() == reflect.TypeOf(time.Time{}) {
 				bins[binName] = value.Interface()
 			} else {
-				// Handle nested structs if needed
 				nestedBins, err := StructToBins(value.Interface())
 				if err != nil {
 					return nil, err
@@ -156,7 +153,7 @@ func StructToBins(data interface{}) (aerospike.BinMap, error) {
 				}
 			}
 		default:
-			// Handle other types or return error for unsupported types
+			fmt.Printf("value type : ", value.Type())
 			return nil, errors.New("unsupported field type: " + field.Name)
 		}
 	}

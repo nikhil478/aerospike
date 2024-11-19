@@ -5,6 +5,7 @@ import (
 	"log"
 
 	aerospike_db "github.com/nikhil478/aerospike/aerospike"
+	"github.com/nikhil478/aerospike/utxo"
 )
 
 const (
@@ -27,37 +28,40 @@ func main() {
 		fmt.Printf("there is some issue while creating aerospike instance %v", asDb)
 		log.Fatal(err)
 	}
-
-	retrieveObj := aerospike_db.AerospikeConfig{}
-
-	asKey, err := asDb.CreateNewRecord(aerospike_db.Activity , config)
-	if err != nil {
-		fmt.Printf("error whil inserting new record %s", err.Error())
-	}
-	
-	err = asDb.GetRecord(asKey, &retrieveObj)
-
-	if err != nil {
-		fmt.Printf("error while fetching record %s", err.Error())
-	}
-
-	interfaceType := aerospike_db.AerospikeConfig{}
-
-	arrObj, err := asDb.GetRecords("activity", map[string]string{}, &interfaceType)
-
-	if err != nil {
-		fmt.Printf("error while fetching records %s", err.Error())
-	}
-
-	fmt.Printf("fetched records succesfully %v", arrObj)
-
-	err= asDb.DeleteRecord(asKey)
-
-	if err != nil {
-		fmt.Printf("error while deleting records %s", err.Error())
-	}
-
-	fmt.Printf("deleted record succesfully ")
-
 	defer asDb.Close()
+
+	utxo.CreateUtxos(asDb)
+
+	// retrieveObj := aerospike_db.AerospikeConfig{}
+
+	// asKey, err := asDb.CreateNewRecord(aerospike_db.Activity , config)
+	// if err != nil {
+	// 	fmt.Printf("error whil inserting new record %s", err.Error())
+	// }
+	
+	// err = asDb.GetRecord(asKey, &retrieveObj)
+
+	// if err != nil {
+	// 	fmt.Printf("error while fetching record %s", err.Error())
+	// }
+
+	// interfaceType := aerospike_db.AerospikeConfig{}
+
+	// arrObj, err := asDb.GetRecords("activity", map[string]string{}, &interfaceType)
+
+	// if err != nil {
+	// 	fmt.Printf("error while fetching records %s", err.Error())
+	// }
+
+	// fmt.Printf("fetched records succesfully %v", arrObj)
+
+	// err= asDb.DeleteRecord(asKey)
+
+	// if err != nil {
+	// 	fmt.Printf("error while deleting records %s", err.Error())
+	// }
+
+	// fmt.Printf("deleted record succesfully ")
+
+	
 }
