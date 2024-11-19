@@ -2,8 +2,8 @@ package utxo
 
 // Utxo is an object representing a BitCoin unspent transaction
 type Utxo struct {
-	Model
-	UtxoPointer
+	*Model
+	*UtxoPointer
 	ID           string `as:"id"`
 	XpubID       string `as:"x_pub_id"`
 	Satoshis     int64  `as:"satoshis"` // as aerospike doesnt support uin64 i m converting this too int64 for now https://github.com/aerospike/aerospike-client-go/issues/62
