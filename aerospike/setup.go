@@ -55,7 +55,7 @@ func NewAerospikeClient(config *AerospikeConfig) (*AerospikeDB, error) {
 		"utxo",
 		"draft_id_idx",
 		"draft_id", 
-		aerospike.NUMERIC)
+		aerospike.STRING)
 	if err != nil {
 		log.Fatal(err)
 	}

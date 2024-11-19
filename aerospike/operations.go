@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/aerospike/aerospike-client-go/v7"
 	"github.com/google/uuid"
@@ -14,7 +15,6 @@ import (
 
 func (adb *AerospikeDB) CreateNewRecord(setName AerospikeSetName, data interface{}) (*aerospike.Key, error) {
 
-	
 	binMap, err := StructToBins(data)
 	if err != nil {
 		return nil, errors.New("failed to convert struct to bins" + err.Error())
@@ -74,17 +74,18 @@ func (adb *AerospikeDB) DeleteRecord(key *aerospike.Key) error {
 func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]any, result interface{}) ([]interface{}, error) {
 
 	statement := aerospike.NewStatement(adb.config.Namespace, string(setName))
+
 	var expressions []*aerospike.Expression
 	queryPolicy := aerospike.NewQueryPolicy()
-	
+	queryPolicy.TotalTimeout = 5000 * time.Millisecond
 
 	for binName, binValue := range conditions {
 		var expression *aerospike.Expression
 		switch v := binValue.(type) {
 		case string:
-			expression = aerospike.ExpEq(aerospike.ExpListBin("draft_id"), aerospike.ExpStringVal(v))
+			expression = aerospike.ExpEq(aerospike.ExpStringBin(binName), aerospike.ExpStringVal(v))
 		// case int, int32, int64:
-		// 	expression = aerospike.ExpEq(aerospike.ExpListBin(binName), aerospike.ExpListVal(v))
+		// 	expression = aerospike.ExpEq(aerospike.ExpStringBin(binName), aerospike.ExpIntVal(int64(v)))
 		// case bool:
 		// 	expression = aerospike.ExpEq(aerospike.ExpListBin(binName), aerospike.ExpListVal(v))
 		default:
@@ -93,11 +94,15 @@ func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[stri
 		expressions = append(expressions, expression)
 	}
 
-	if len(expressions) > 0 {
+	if len(expressions) > 1 {
 		filter := aerospike.ExpAnd(expressions...)
 		queryPolicy.FilterExpression = filter
 	}
 
+	if len(expressions) == 1 {
+		queryPolicy.FilterExpression = expressions[0]
+	}
+	
 	recordset, err := adb.client.Query(queryPolicy, statement)
 	if err != nil {
 		return nil, err

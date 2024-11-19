@@ -124,3 +124,7 @@ aql -h 127.0.0.1 -p 3000
 This will start an interactive session where you can run queries and manage your Aerospike database.
 
 ---
+
+This cmnd is for delete an index 
+
+asadm -e 'enable; manage sindex delete occurred_idx ns test utxo draft_id'
