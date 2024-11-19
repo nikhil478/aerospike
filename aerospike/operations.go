@@ -102,7 +102,7 @@ func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[stri
 	if len(expressions) == 1 {
 		queryPolicy.FilterExpression = expressions[0]
 	}
-	
+
 	recordset, err := adb.client.Query(queryPolicy, statement)
 	if err != nil {
 		return nil, err

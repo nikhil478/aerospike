@@ -50,11 +50,11 @@ func NewAerospikeClient(config *AerospikeConfig) (*AerospikeDB, error) {
 		return nil, fmt.Errorf("failed to connect to Aerospike at %s:%d: %v", config.Address, config.Port, err)
 	}
 
-	task, err :=  client.CreateIndex(nil,
+	task, err := client.CreateIndex(nil,
 		"test",
 		"utxo",
 		"draft_id_idx",
-		"draft_id", 
+		"draft_id",
 		aerospike.STRING)
 	if err != nil {
 		log.Fatal(err)
@@ -67,7 +67,7 @@ func NewAerospikeClient(config *AerospikeConfig) (*AerospikeDB, error) {
 			return nil, fmt.Errorf("index creation failed: %v", err.Error())
 		}
 	}
-	
+
 	return &AerospikeDB{
 		client:       client,
 		createPolicy: getCreatePolicy(),
