@@ -28,7 +28,10 @@ func main() {
 		fmt.Printf("there is some issue while creating aerospike instance %v", asDb)
 		log.Fatal(err)
 	}
+
 	defer asDb.Close()
+
+	
 
 	utxo.UpdateUtxos(asDb)
 

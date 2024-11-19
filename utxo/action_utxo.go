@@ -33,9 +33,12 @@ func CreateUtxos(db *aerospike_db.AerospikeDB) {
 }
 
 func UpdateUtxos(db *aerospike_db.AerospikeDB) {
-	freeUtxos, err := db.GetRecords(aerospike_db.Utxo, map[string]string{}, &Utxo{})
+	freeUtxos, err := db.GetRecords(aerospike_db.Utxo, map[string]any{
+		"draft_id": "draftID",
+	}, &Utxo{})
 	if err != nil {
 		fmt.Printf("there is an error while processing get records func", err.Error())
 	}
+
 	fmt.Printf("utxo list %v", freeUtxos...)
 }

@@ -2,6 +2,7 @@ package aerospike_db
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/aerospike/aerospike-client-go/v7"
@@ -70,17 +71,34 @@ func (adb *AerospikeDB) DeleteRecord(key *aerospike.Key) error {
 	return nil
 }
 
-func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]string, result interface{}) ([]interface{}, error) {
+func (adb *AerospikeDB) GetRecords(setName AerospikeSetName, conditions map[string]any, result interface{}) ([]interface{}, error) {
 
 	statement := aerospike.NewStatement(adb.config.Namespace, string(setName))
+	var expressions []*aerospike.Expression
+	queryPolicy := aerospike.NewQueryPolicy()
+	
 
-	// note we can only pass one condition now there is an workaroud for multiple condition with policies which we havent yet implemented
 	for binName, binValue := range conditions {
-		filter := aerospike.NewEqualFilter(binName, binValue)
-		statement.SetFilter(filter)
+		var expression *aerospike.Expression
+		switch v := binValue.(type) {
+		case string:
+			expression = aerospike.ExpEq(aerospike.ExpListBin("draft_id"), aerospike.ExpStringVal(v))
+		// case int, int32, int64:
+		// 	expression = aerospike.ExpEq(aerospike.ExpListBin(binName), aerospike.ExpListVal(v))
+		// case bool:
+		// 	expression = aerospike.ExpEq(aerospike.ExpListBin(binName), aerospike.ExpListVal(v))
+		default:
+			return nil, fmt.Errorf("unsupported condition type for bin %s: %T", binName, v)
+		}
+		expressions = append(expressions, expression)
 	}
 
-	recordset, err := adb.client.Query(adb.queryPolicy, statement)
+	if len(expressions) > 0 {
+		filter := aerospike.ExpAnd(expressions...)
+		queryPolicy.FilterExpression = filter
+	}
+
+	recordset, err := adb.client.Query(queryPolicy, statement)
 	if err != nil {
 		return nil, err
 	}

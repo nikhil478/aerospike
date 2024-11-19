@@ -2,6 +2,7 @@ package aerospike_db
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/aerospike/aerospike-client-go/v7"
 )
@@ -49,6 +50,24 @@ func NewAerospikeClient(config *AerospikeConfig) (*AerospikeDB, error) {
 		return nil, fmt.Errorf("failed to connect to Aerospike at %s:%d: %v", config.Address, config.Port, err)
 	}
 
+	task, err :=  client.CreateIndex(nil,
+		"test",
+		"utxo",
+		"draft_id_idx",
+		"draft_id", 
+		aerospike.NUMERIC)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	select {
+	case <-task.OnComplete():
+		isDone, err := task.IsDone()
+		if !isDone {
+			return nil, fmt.Errorf("index creation failed: %v", err.Error())
+		}
+	}
+	
 	return &AerospikeDB{
 		client:       client,
 		createPolicy: getCreatePolicy(),
